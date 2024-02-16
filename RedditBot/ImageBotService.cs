@@ -19,10 +19,9 @@ namespace RedditBot
             Console.WriteLine("Connecting to Telegram...");
             await client.LoginUserIfNeeded();
 
-            var channelName = "moarlurk"; 
-            Console.WriteLine($"Accessing the channel: {channelName}");
+            Console.WriteLine($"Accessing the channel: {telegramConfig.ChannelName}");
 
-            var channel = await client.Contacts_ResolveUsername(channelName);
+            var channel = await client.Contacts_ResolveUsername(telegramConfig.ChannelName);
             var peer = new InputPeerChannel(channel.Channel.ID, channel.Channel.access_hash);
 
             Console.WriteLine("Getting messages...");
