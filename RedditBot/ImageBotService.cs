@@ -1,6 +1,7 @@
 ﻿
 
 using TL;
+using WTelegram;
 
 namespace RedditBot
 {
@@ -25,10 +26,37 @@ namespace RedditBot
             var peer = new InputPeerChannel(channel.Channel.ID, channel.Channel.access_hash);
 
             Console.WriteLine("Getting messages...");
-            var messages = await client.Messages_GetHistory(peer, limit: 10);
+            var messages = await client.Messages_GetHistory(peer, limit: 20);
             foreach (var message in messages.Messages)
             {
                 Console.WriteLine(message);
+                await SaveImageFromMessageAsync(message, "images", client);
+            }
+        }
+
+        private async Task SaveImageFromMessageAsync(MessageBase messageBase, string folderPath, Client client)
+        {
+            if (messageBase is Message message && message.media is MessageMediaPhoto photoMedia)
+            {
+                var photo = photoMedia.photo as Photo;
+                var photoSize = photo?.sizes.OfType<PhotoSize>().LastOrDefault(); // Выбираем наибольший размер
+                if (photoSize == null) return;
+
+                var filePath = Path.Combine(folderPath, $"{photo.id}.jpg");
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+                await using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    try {
+                        var fileType = await client.DownloadFileAsync(photo, fileStream, photoSize);
+                    }
+
+                    catch(Exception ex) {
+                        Console.WriteLine(ex.ToString());
+                    }
+                }
             }
         }
 
