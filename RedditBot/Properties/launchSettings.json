@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "RedditBot": {
+      "commandName": "Project"
+    },
+    "Development": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
