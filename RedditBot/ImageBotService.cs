@@ -1,6 +1,4 @@
-﻿
-
-using TL;
+﻿using TL;
 using WTelegram;
 
 namespace RedditBot

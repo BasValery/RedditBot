@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Dev",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/bin/Debug/net7.0/RedditBot.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "requireExactSource": false,
+            "enableStepFiltering": true,
+            "justMyCode": true,
+            "logging": {
+                "moduleLoad": false
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DOTNET_USE_POLLING_FILE_WATCHER": "1",
+                "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT": "1"
+            }
+        }
+    ]
+}
