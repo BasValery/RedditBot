@@ -1,0 +1,49 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Scrapper-Dev",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-scrapper",
+            "program": "${workspaceFolder}/TelegramScrapper/bin/Debug/net7.0/TelegramScrapper.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/TelegramScrapper",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "requireExactSource": false,
+            "enableStepFiltering": true,
+            "justMyCode": true,
+            "logging": {
+                "moduleLoad": false
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DOTNET_USE_POLLING_FILE_WATCHER": "1",
+                "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT": "1"
+            }
+        },
+        {
+            "name": "MemPoster-Dev",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-memposter",
+            "program": "${workspaceFolder}/MemPoster/bin/Debug/net7.0/MemPoster.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/MemPoster",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "requireExactSource": false,
+            "enableStepFiltering": true,
+            "justMyCode": true,
+            "logging": {
+                "moduleLoad": false
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DOTNET_USE_POLLING_FILE_WATCHER": "1",
+                "DOTNET_SYSTEM_GLOBALIZATION_INVARIANT": "1"
+            }
+        }
+    ]
+}

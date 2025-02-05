@@ -1,7 +1,7 @@
 ﻿using TL;
 using WTelegram;
 
-namespace RedditBot
+namespace TelegramScrapper
 {
     public class ImageBotService
     {

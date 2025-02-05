@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-scrapper",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/TelegramScrapper"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-memposter",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/MemPoster"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
