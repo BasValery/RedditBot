@@ -13,4 +13,8 @@ namespace TelegramScrapper
         public string PhoneNumber { get; set; }
         public string ChannelName { get; set; }
     }
+    public class ScrapperConfig
+    {
+        public string ImageFolder { get; set; }
+    }
 }

@@ -19,14 +19,10 @@ class Program
             .Build();
 
         var telegramConfig = Configuration.GetSection("Telegram").Get<TelegramConfig>();
+        var scrapperConfig = Configuration.GetSection("ScrapperConfig").Get<ScrapperConfig>();
 
-        if (telegramConfig == null)
-        {
-            Console.WriteLine("Telegram configuration was not loaded");
-            return;
-        }
 
-        var imageBotService = new ImageBotService(telegramConfig);
+        var imageBotService = new ImageBotService(telegramConfig, scrapperConfig);
         await imageBotService.Run();
     }
 }

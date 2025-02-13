@@ -6,9 +6,12 @@ namespace TelegramScrapper
     public class ImageBotService
     {
         private readonly TelegramConfig telegramConfig;
-        public ImageBotService(TelegramConfig telegramConfig)
+        private readonly ScrapperConfig scrapperConfig;
+
+        public ImageBotService(TelegramConfig? telegramConfig, ScrapperConfig? scrapperConfig)
         {
-           this.telegramConfig = telegramConfig ?? throw new ArgumentNullException(nameof(telegramConfig));
+            this.telegramConfig = telegramConfig ?? throw new ArgumentNullException(nameof(telegramConfig));
+            this.scrapperConfig = scrapperConfig ?? throw new ArgumentNullException(nameof(scrapperConfig));
         }
 
         public async Task Run()
@@ -16,44 +19,77 @@ namespace TelegramScrapper
             using var client = new WTelegram.Client(Config);
 
             Console.WriteLine("Connecting to Telegram...");
+            // Login the user if it's not done already
             await client.LoginUserIfNeeded();
 
             Console.WriteLine($"Accessing the channel: {telegramConfig.ChannelName}");
 
             var channel = await client.Contacts_ResolveUsername(telegramConfig.ChannelName);
-            var peer = new InputPeerChannel(channel.Channel.ID, channel.Channel.access_hash);
+            var channelPeer = channel.Channel; // An object of type Channel
 
-            Console.WriteLine("Getting messages...");
-            var messages = await client.Messages_GetHistory(peer, limit: 20);
-            foreach (var message in messages.Messages)
+            Console.WriteLine("Start listening for new messages...");
+
+            client.OnUpdate += async update => await Client_OnUpdate(update, channelPeer, client);
+
+            // Keep the task alive indefinitely, so the app doesn't exit
+            await Task.Delay(-1);
+        }
+
+        /// <summary>
+        /// This method will be called on each new update from Telegram.
+        /// </summary>
+        private async Task Client_OnUpdate(UpdatesBase update, Channel channelPeer, Client client)
+        {
+            //Take only messages with photos
+            foreach (var updateMsg in update.UpdateList)
             {
-                Console.WriteLine(message);
-                await SaveImageFromMessageAsync(message, "images", client);
+                
+                if (updateMsg is UpdateNewChannelMessage newMessage)
+                {
+                    if( newMessage.message.Peer.ID == channelPeer.ID
+                        && newMessage.message is Message messageInfo
+                        && string.IsNullOrEmpty(messageInfo.message)
+                        && messageInfo.media is MessageMediaPhoto messageMediaPhoto
+                        && messageMediaPhoto is not null
+                    )
+                    {
+                        await SaveImageFromMessageAsync(messageInfo, client);
+                    }
+                }
             }
         }
 
-        private async Task SaveImageFromMessageAsync(MessageBase messageBase, string folderPath, Client client)
+        private async Task SaveImageFromMessageAsync(Message message, Client client)
         {
-            if (messageBase is Message message && message.media is MessageMediaPhoto photoMedia)
+            if (message.media is MessageMediaPhoto photoMedia)
             {
+                // Extract the photo object
                 var photo = photoMedia.photo as Photo;
-                var photoSize = photo?.sizes.OfType<PhotoSize>().LastOrDefault(); // Выбираем наибольший размер
+                if (photo == null) return;
+
+                // Typically, the largest photo is the last in the sizes array
+                var photoSize = photo.sizes.OfType<PhotoSize>().LastOrDefault();
                 if (photoSize == null) return;
 
-                var filePath = Path.Combine(folderPath, $"{photo.id}.jpg");
-                if (!Directory.Exists(folderPath))
+                // Use the photo.id as the file name + ".jpg"
+                // (you can detect the actual format if needed)
+                if (!Directory.Exists(scrapperConfig.ImageFolder))
                 {
-                    Directory.CreateDirectory(folderPath);
+                    Directory.CreateDirectory(scrapperConfig.ImageFolder);
                 }
-                await using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                {
-                    try {
-                        var fileType = await client.DownloadFileAsync(photo, fileStream, photoSize);
-                    }
 
-                    catch(Exception ex) {
-                        Console.WriteLine(ex.ToString());
-                    }
+                var filePath = Path.Combine(scrapperConfig.ImageFolder, $"{photo.id}.jpg");
+
+                await using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                try
+                {
+                    // DownloadFileAsync can return the file type, but we'll just store everything as .jpg
+                    var fileType = await client.DownloadFileAsync(photo, fileStream, photoSize);
+                    Console.WriteLine($"Photo saved: {filePath}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
                 }
             }
         }
@@ -62,7 +98,7 @@ namespace TelegramScrapper
         {
             switch (what)
             {
-                case "api_id": return telegramConfig.ApiId; 
+                case "api_id": return telegramConfig.ApiId;
                 case "api_hash": return telegramConfig.ApiHash;
                 case "phone_number": return telegramConfig.PhoneNumber;
                 default: return null;
