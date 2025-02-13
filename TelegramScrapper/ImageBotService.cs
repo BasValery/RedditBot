@@ -40,12 +40,12 @@ namespace TelegramScrapper
         /// </summary>
         private async Task Client_OnUpdate(UpdatesBase update, Channel channelPeer, Client client)
         {
-            //Take only messages with photos
             foreach (var updateMsg in update.UpdateList)
             {
                 
                 if (updateMsg is UpdateNewChannelMessage newMessage)
                 {
+                   // Select only new messages without a caption to avoid advertisements
                     if( newMessage.message.Peer.ID == channelPeer.ID
                         && newMessage.message is Message messageInfo
                         && string.IsNullOrEmpty(messageInfo.message)
