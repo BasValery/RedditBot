@@ -20,6 +20,16 @@
         "${workspaceFolder}/MemPoster"
       ],
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-imagenameresolver",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/ImageNameResolver"
+      ],
+      "problemMatcher": "$msCompile"
     }
   ]
 }

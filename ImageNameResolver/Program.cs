@@ -1,17 +1,25 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-var config = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("AppSettings.json", optional: true, reloadOnChange: true)
-    .Build();
-
-var appSettings = config.GetSection("AppSettings").Get<AppSettings>();
-
-if (appSettings != null)
+class Program
 {
-    Console.WriteLine($"Configured path: {appSettings.Path}");
-}
-else
-{
-    Console.WriteLine("Failed to load configuration.");
+    static void Main()
+    {
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton<IConfiguration>(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build())
+            .AddSingleton<IImageProcessor, GPTProcessor>()
+            .AddSingleton<IFolderWatcher, FolderWatcher>()
+            .BuildServiceProvider();
+
+        var folderWatcher = serviceProvider.GetService<IFolderWatcher>();
+
+        if (folderWatcher == null){
+                Console.WriteLine("FolderWatcher is null");
+                return;
+        }
+        
+        folderWatcher.StartWatching();
+        Console.WriteLine("Waiting new files...");
+        Console.ReadLine();
+    }
 }
